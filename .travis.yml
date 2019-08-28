@@ -25,7 +25,5 @@ script:
   - golint -set_exit_status ./...
   - go build .
 after_script:
-  - bash .travis-deploy/docker.sh
-  - bash .travis-deploy/cloudformation.sh
-  - bash .travis-deploy/data.sh
-  - bash .travis-deploy/cloudfront.sh
+  - zip $TRAVIS_BUILD_ID.zip $SERVICE_NAME
+  - bash .travis-deploy/cloud.sh

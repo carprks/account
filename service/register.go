@@ -3,19 +3,21 @@ package service
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	login "github.com/carprks/login/service"
-	permissions "github.com/carparks/permissions/service"
+	permissions "github.com/carprks/permissions/service"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 )
 
 // RegisterObject ...
 type RegisterObject struct {
-	ID          string       `json:"id"`
-	Email       string       `json:"email"`
-	Permissions []Permission `json:"permissions"`
+	Identifier  string                   `json:"identifier"`
+	Email       string                   `json:"email"`
+	Permissions []permissions.Permission `json:"permissions"`
 }
 
 // RegisterHandler what is used by service
@@ -52,7 +54,7 @@ func Register(r login.RegisterRequest) (RegisterObject, error) {
 	}
 
 	return RegisterObject{
-		ID:          ro.ID,
+		Identifier:  ro.Identifier,
 		Email:       ro.Email,
 		Permissions: resp,
 	}, nil
@@ -78,6 +80,7 @@ func CreateLogin(r login.RegisterRequest) (login.Register, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("client err: %v", err))
+		return rr, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
@@ -87,18 +90,68 @@ func CreateLogin(r login.RegisterRequest) (login.Register, error) {
 			return rr, err
 		}
 
-		err = json.Unmarshal(body, &rr)
+		rt := login.Register{}
+
+		err = json.Unmarshal(body, &rt)
 		if err != nil {
-			return rr, err
+			return rt, err
 		}
+
+		if rt.Error != "" {
+			if strings.Contains(rt.Error, "ErrCodeConditionalCheckFailedException") {
+				return rt, errors.New("login already exists")
+			}
+			return rt, errors.New(rt.Error)
+		}
+
+		return rt, nil
 	}
 
-	return rr, nil
+	return rr, errors.New("can't create login")
 }
 
 // CreatePermissions ...
-func CreatePermissions(r login.Register) ([]Permission, error) {
-	// rr := perm.
+func CreatePermissions(r login.Register) ([]permissions.Permission, error) {
+	perms := []permissions.Permission{
+		{
+			Identifier: r.Identifier,
+			Name:       "account",
+			Action:     "login",
+		},
+		{
+			Identifier: "*",
+			Name:       "carparks",
+			Action:     "book",
+		},
+	}
 
-	return []Permission{}, nil
+	p := permissions.Permissions{
+		Identifier:  r.Identifier,
+		Permissions: perms,
+	}
+
+	j, err := json.Marshal(&p)
+	if err != nil {
+		return []permissions.Permission{}, err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/create", os.Getenv("SERVICE_PERMISSIONS")), bytes.NewBuffer(j))
+	if err != nil {
+		fmt.Println(fmt.Sprintf("req err: %v", err))
+	}
+
+	req.Header.Set("X-Authorization", os.Getenv("AUTH_KEY"))
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("client err: %v", err))
+		return []permissions.Permission{}, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == 200 {
+		return perms, nil
+	}
+
+	return []permissions.Permission{}, errors.New("can't create permissions")
 }
