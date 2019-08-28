@@ -15,16 +15,19 @@ func AllowedHandler(body string) (string, error) {
 	r := permissions.Permissions{}
 	err := json.Unmarshal([]byte(body), &r)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't unmarshall input: %v, %v", err, body))
 		return "", err
 	}
 
 	rf, err := Allowed(r)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't get allowed: %v, %v", err, r))
 		return "", err
 	}
 
 	rfb, err := json.Marshal(rf)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't marshal allowed: %v, %v", err, rf))
 		return "", err
 	}
 
@@ -37,6 +40,7 @@ func Allowed(p permissions.Permissions) (permissions.Permissions, error) {
 
 	j, err := json.Marshal(&p)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't unmarshal permissions: %v, %v", err, p))
 		return pr, err
 	}
 
@@ -64,6 +68,7 @@ func Allowed(p permissions.Permissions) (permissions.Permissions, error) {
 
 		err = json.Unmarshal(body, &pr)
 		if err != nil {
+			fmt.Println(fmt.Sprintf("can't unmarshall permissions: %v, %v", err, string(body)))
 			return pr, err
 		}
 	}

@@ -214,6 +214,9 @@ Resources:
         - StatusCode: 400
           ResponseModels:
             application/json: !Ref EmptyModel
+        - StatusCode: 500
+          ResponseModels:
+            application/json: !Ref EmptyModel
       Integration:
         Type: AWS_PROXY
         Uri: !Sub >-
@@ -223,6 +226,7 @@ Resources:
           - StatusCode: 200
           - StatusCode: 502
           - StatusCode: 400
+          - StatusCode: 500
 
   RestAPIDeployment:
     Type: AWS::ApiGateway::Deployment

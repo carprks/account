@@ -23,16 +23,19 @@ func LoginHandler(body string) (string, error) {
 	r := login.LoginRequest{}
 	err := json.Unmarshal([]byte(body), &r)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't unmarshall login: %v, %v", err, body))
 		return "", err
 	}
 
 	rf, err := Login(r)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't get login: %v, %v", err, r))
 		return "", err
 	}
 
 	rfb, err := json.Marshal(rf)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't marshall login: %v, %v", err, rf))
 		return "", err
 	}
 
@@ -43,11 +46,13 @@ func LoginHandler(body string) (string, error) {
 func Login(l login.LoginRequest) (LoginObject, error) {
 	lo, err := LoginUser(l)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't get login for user: %v, %v", err, l))
 		return LoginObject{}, err
 	}
 
 	resp, err := LoginPermissions(lo)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't get permissions for user: %v, %v", err, lo))
 		return LoginObject{}, err
 	}
 
@@ -63,12 +68,14 @@ func LoginUser(l login.LoginRequest) (login.Login, error) {
 
 	j, err := json.Marshal(&l)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't unmarshall login: %v, %v", err, l))
 		return lr, err
 	}
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/login", os.Getenv("SERVICE_LOGIN")), bytes.NewBuffer(j))
 	if err != nil {
 		fmt.Println(fmt.Sprintf("req err: %v", err))
+		return lr, err
 	}
 
 	req.Header.Set("X-Authorization", os.Getenv("AUTH_KEY"))
@@ -89,6 +96,7 @@ func LoginUser(l login.LoginRequest) (login.Login, error) {
 
 		err = json.Unmarshal(body, &lr)
 		if err != nil {
+			fmt.Println(fmt.Sprintf("can't unmarshal login service: %v, %v", err, string(body)))
 			return lr, err
 		}
 
@@ -114,6 +122,7 @@ func LoginPermissions(l login.Login) ([]permissions.Permission, error) {
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/retrieve", os.Getenv("SERVICE_PERMISSIONS")), bytes.NewBuffer(j))
 	if err != nil {
 		fmt.Println(fmt.Sprintf("req err: %v", err))
+		return p.Permissions, err
 	}
 
 	req.Header.Set("X-Authorization", os.Getenv("AUTH_KEY"))
@@ -134,6 +143,7 @@ func LoginPermissions(l login.Login) ([]permissions.Permission, error) {
 
 		err = json.Unmarshal(body, &p)
 		if err != nil {
+			fmt.Println(fmt.Sprintf("can't unmarshall permissions body: %v, %v", err, string(body)))
 			return p.Permissions, err
 		}
 

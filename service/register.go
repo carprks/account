@@ -25,16 +25,19 @@ func RegisterHandler(body string) (string, error) {
 	r := login.RegisterRequest{}
 	err := json.Unmarshal([]byte(body), &r)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't unmarshall register: %v, %v", err, body))
 		return "", err
 	}
 
 	rf, err := Register(r)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't register: %v, %v", err, r))
 		return "", err
 	}
 
 	rfb, err := json.Marshal(rf)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't marshall register: %v, %v", err, rf))
 		return "", err
 	}
 
@@ -45,11 +48,13 @@ func RegisterHandler(body string) (string, error) {
 func Register(r login.RegisterRequest) (RegisterObject, error) {
 	ro, err := CreateLogin(r)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't get create login: %v, %v", err, r))
 		return RegisterObject{}, err
 	}
 
 	resp, err := CreatePermissions(ro)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't create permissions: %v, %v", err, ro))
 		return RegisterObject{}, err
 	}
 
@@ -66,12 +71,14 @@ func CreateLogin(r login.RegisterRequest) (login.Register, error) {
 
 	j, err := json.Marshal(&r)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't marshall register: %v, %v", err, r))
 		return rr, err
 	}
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/register", os.Getenv("SERVICE_LOGIN")), bytes.NewBuffer(j))
 	if err != nil {
 		fmt.Println(fmt.Sprintf("req err: %v", err))
+		return rr, err
 	}
 
 	req.Header.Set("X-Authorization", os.Getenv("AUTH_KEY"))
@@ -94,6 +101,7 @@ func CreateLogin(r login.RegisterRequest) (login.Register, error) {
 
 		err = json.Unmarshal(body, &rt)
 		if err != nil {
+			fmt.Println(fmt.Sprintf("can't unmarshal register body: %v, %v", err, string(body)))
 			return rt, err
 		}
 
@@ -132,12 +140,14 @@ func CreatePermissions(r login.Register) ([]permissions.Permission, error) {
 
 	j, err := json.Marshal(&p)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("can't marshall permissions: %v, %v", err, p))
 		return []permissions.Permission{}, err
 	}
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/create", os.Getenv("SERVICE_PERMISSIONS")), bytes.NewBuffer(j))
 	if err != nil {
 		fmt.Println(fmt.Sprintf("req err: %v", err))
+		return []permissions.Permission{}, err
 	}
 
 	req.Header.Set("X-Authorization", os.Getenv("AUTH_KEY"))
