@@ -21,21 +21,27 @@ Parameters:
     Type: String
   BuildKey:
     Type: String
+  PermissionService:
+    Type: String
+  LoginService:
+    Type: String
+  AuthKey:
+    Type: String
 
 Resources:
-  Dynamo:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Join ['-', [!Ref ServiceName, dynamo, !Ref Environment]]
-      AttributeDefinitions:
-        - AttributeName: identifier
-          AttributeType: S
-      KeySchema:
-        - AttributeName: identifier
-          KeyType: HASH
-      ProvisionedThroughput:
-        WriteCapacityUnits: 5
-        ReadCapacityUnits: 5
+#  Dynamo:
+#    Type: AWS::DynamoDB::Table
+#    Properties:
+#      TableName: !Join ['-', [!Ref ServiceName, dynamo, !Ref Environment]]
+#      AttributeDefinitions:
+#        - AttributeName: identifier
+#          AttributeType: S
+#      KeySchema:
+#        - AttributeName: identifier
+#          KeyType: HASH
+#      ProvisionedThroughput:
+#        WriteCapacityUnits: 5
+#        ReadCapacityUnits: 5
 
   AuthorizerRole:
     Type: AWS::IAM::Role
@@ -285,20 +291,20 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: '*'
-              - Effect: Allow
-                Action: dynamodb:*
-                Resource: !GetAtt Dynamo.Arn
-              - Effect: Allow
-                Resource: '*'
-                Action:
-                  - dynamodb:DescribeReservedCapacityOfferings
-                  - dynamodb:ListGlobalTables
-                  - dynamodb:ListTables
-                  - dynamodb:DescribeReservedCapacity
-                  - dynamodb:ListBackups
-                  - dynamodb:PurchaseReservedCapacityOfferings
-                  - dynamodb:DescribeLimits
-                  - dynamodb:ListStreams
+#              - Effect: Allow
+#                Action: dynamodb:*
+#                Resource: !GetAtt Dynamo.Arn
+#              - Effect: Allow
+#                Resource: '*'
+#                Action:
+#                  - dynamodb:DescribeReservedCapacityOfferings
+#                  - dynamodb:ListGlobalTables
+#                  - dynamodb:ListTables
+#                  - dynamodb:DescribeReservedCapacity
+#                  - dynamodb:ListBackups
+#                  - dynamodb:PurchaseReservedCapacityOfferings
+#                  - dynamodb:DescribeLimits
+#                  - dynamodb:ListStreams
   Service:
     Type: AWS::Lambda::Function
     Properties:
@@ -309,9 +315,12 @@ Resources:
       Timeout: 10
       Environment:
         Variables:
-          DB_TABLE: !Ref Dynamo
-          DB_ENDPOINT: !Join ['', ['http://', 'dynamodb.', !Ref 'AWS::Region', '.amazonaws.com']]
-          DB_REGION: !Ref AWS::Region
+#          DB_TABLE: !Ref Dynamo
+#          DB_ENDPOINT: !Join ['', ['http://', 'dynamodb.', !Ref 'AWS::Region', '.amazonaws.com']]
+#          DB_REGION: !Ref AWS::Region
+          SERVICE_LOGIN: !Ref LoginService
+          SERVICE_PERMISSIONS: !Ref PermissionService
+          AUTH_KEY: !Ref AuthKey
       Code:
         S3Bucket: !Ref BuildBucket
         S3Key: !Ref BuildKey
