@@ -54,7 +54,7 @@ cloudFormation()
                 ParameterKey=CertificateARN,ParameterValue="$CERTIFICATE_ARN" \
                 ParameterKey=DNSZoneName,ParameterValue="$DNS_ZONE_NAME". \
                 ParameterKey=LoginService,ParameterValue="$SERVICE_LOGIN" \
-                ParameterKey=PermissionsService,ParameterValue="$SERVICE_PERMISSIONS" \
+                ParameterKey=PermissionService,ParameterValue="$SERVICE_PERMISSIONS" \
                 ParameterKey=AuthKey,ParameterValue="$AUTH_KEY"
     else
         AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws cloudformation update-stack \
@@ -72,7 +72,7 @@ cloudFormation()
                 ParameterKey=CertificateARN,ParameterValue="$CERTIFICATE_ARN" \
                 ParameterKey=DNSZoneName,ParameterValue="$DNS_ZONE_NAME". \
                 ParameterKey=LoginService,ParameterValue="$SERVICE_LOGIN" \
-                ParameterKey=PermissionsService,ParameterValue="$SERVICE_PERMISSIONS" \
+                ParameterKey=PermissionService,ParameterValue="$SERVICE_PERMISSIONS" \
                 ParameterKey=AuthKey,ParameterValue="$AUTH_KEY"
     fi
 }
