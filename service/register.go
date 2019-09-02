@@ -120,22 +120,9 @@ func CreateLogin(r login.RegisterRequest) (login.Register, error) {
 
 // CreatePermissions ...
 func CreatePermissions(r login.Register) ([]permissions.Permission, error) {
-	perms := []permissions.Permission{
-		{
-			Identifier: r.Identifier,
-			Name:       "account",
-			Action:     "login",
-		},
-		{
-			Identifier: "*",
-			Name:       "carparks",
-			Action:     "book",
-		},
-	}
-
 	p := permissions.Permissions{
 		Identifier:  r.Identifier,
-		Permissions: perms,
+		Permissions: getDefaultPerms(r.Identifier),
 	}
 
 	j, err := json.Marshal(&p)
@@ -160,7 +147,7 @@ func CreatePermissions(r login.Register) ([]permissions.Permission, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
-		return perms, nil
+		return getDefaultPerms(r.Identifier), nil
 	}
 
 	return []permissions.Permission{}, errors.New("can't create permissions")

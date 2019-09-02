@@ -44,8 +44,38 @@ func TestRegister(t *testing.T) {
 						Identifier: "5f46cf19-5399-55e3-aa62-0e7c19382250",
 					},
 					{
+						Name:       "account",
+						Action:     "edit",
+						Identifier: "5f46cf19-5399-55e3-aa62-0e7c19382250",
+					},
+					{
+						Name:       "account",
+						Action:     "view",
+						Identifier: "5f46cf19-5399-55e3-aa62-0e7c19382250",
+					},
+					{
+						Name:       "payments",
+						Action:     "create",
+						Identifier: "5f46cf19-5399-55e3-aa62-0e7c19382250",
+					},
+					{
+						Name:       "payments",
+						Action:     "view",
+						Identifier: "5f46cf19-5399-55e3-aa62-0e7c19382250",
+					},
+					{
+						Name:       "payments",
+						Action:     "report",
+						Identifier: "5f46cf19-5399-55e3-aa62-0e7c19382250",
+					},
+					{
 						Name:       "carparks",
 						Action:     "book",
+						Identifier: "*",
+					},
+					{
+						Name:       "carparks",
+						Action:     "report",
 						Identifier: "*",
 					},
 				},
@@ -107,8 +137,38 @@ func TestCreatePermissions(t *testing.T) {
 					Identifier: "tester",
 				},
 				{
+					Name:       "account",
+					Action:     "edit",
+					Identifier: "tester",
+				},
+				{
+					Name:       "account",
+					Action:     "view",
+					Identifier: "tester",
+				},
+				{
+					Name:       "payments",
+					Action:     "create",
+					Identifier: "tester",
+				},
+				{
+					Name:       "payments",
+					Action:     "view",
+					Identifier: "tester",
+				},
+				{
+					Name:       "payments",
+					Action:     "report",
+					Identifier: "tester",
+				},
+				{
 					Name:       "carparks",
 					Action:     "book",
+					Identifier: "*",
+				},
+				{
+					Name:       "carparks",
+					Action:     "report",
 					Identifier: "*",
 				},
 			},

@@ -115,7 +115,7 @@ func TestHandler(t *testing.T) {
 			},
 			expect: events.APIGatewayProxyResponse{
 				StatusCode: 200,
-				Body:       `{"identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250","email":"tester@carpark.ninja","permissions":[{"name":"account","action":"login","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"carparks","action":"book","identifier":"*"}]}`,
+				Body:       `{"identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250","email":"tester@carpark.ninja","permissions":[{"name":"account","action":"login","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"account","action":"edit","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"account","action":"view","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"payments","action":"create","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"payments","action":"view","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"payments","action":"report","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"carparks","action":"book","identifier":"*"},{"name":"carparks","action":"report","identifier":"*"}]}`,
 			},
 			err: nil,
 		},
@@ -138,7 +138,7 @@ func TestHandler(t *testing.T) {
 			},
 			expect: events.APIGatewayProxyResponse{
 				StatusCode: 200,
-				Body:       `{"identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250","permissions":[{"name":"account","action":"login","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"carparks","action":"book","identifier":"*"}]}`,
+				Body:       `{"identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250","permissions":[{"name":"account","action":"login","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"account","action":"edit","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"account","action":"view","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"payments","action":"create","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"payments","action":"view","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"payments","action":"report","identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250"},{"name":"carparks","action":"book","identifier":"*"},{"name":"carparks","action":"report","identifier":"*"}]}`,
 			},
 		},
 		{

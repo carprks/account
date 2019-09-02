@@ -49,11 +49,41 @@ func TestLogin(t *testing.T) {
 					{
 						Name:       "account",
 						Action:     "login",
-						Identifier: "5f46cf19-5399-55e3-aa62-0e7c19382250",
+						Identifier: resp.Identifier,
+					},
+					{
+						Name:       "account",
+						Action:     "edit",
+						Identifier: resp.Identifier,
+					},
+					{
+						Name:       "account",
+						Action:     "view",
+						Identifier: resp.Identifier,
+					},
+					{
+						Name:       "payments",
+						Action:     "create",
+						Identifier: resp.Identifier,
+					},
+					{
+						Name:       "payments",
+						Action:     "view",
+						Identifier: resp.Identifier,
+					},
+					{
+						Name:       "payments",
+						Action:     "report",
+						Identifier: resp.Identifier,
 					},
 					{
 						Name:       "carparks",
 						Action:     "book",
+						Identifier: "*",
+					},
+					{
+						Name:       "carparks",
+						Action:     "report",
 						Identifier: "*",
 					},
 				},
