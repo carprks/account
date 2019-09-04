@@ -16,19 +16,19 @@ func AllowedHandler(body string) (string, error) {
 	err := json.Unmarshal([]byte(body), &r)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("can't unmarshall input: %v, %v", err, body))
-		return "", err
+		return "", fmt.Errorf("can't unmarshall input: %w", err)
 	}
 
 	rf, err := Allowed(r)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("can't get allowed: %v, %v", err, r))
-		return "", err
+		return "", fmt.Errorf("can't get allowed: %w", err)
 	}
 
 	rfb, err := json.Marshal(rf)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("can't marshal allowed: %v, %v", err, rf))
-		return "", err
+		return "", fmt.Errorf("can't unmarshal allowed: %w", err)
 	}
 
 	return string(rfb), nil
@@ -41,13 +41,13 @@ func Allowed(p permissions.Permissions) (permissions.Permissions, error) {
 	j, err := json.Marshal(&p)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("can't unmarshal permissions: %v, %v", err, p))
-		return pr, err
+		return pr, fmt.Errorf("can't unmarshal permissions: %w", err)
 	}
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/allowed", os.Getenv("SERVICE_PERMISSIONS")), bytes.NewBuffer(j))
 	if err != nil {
 		fmt.Println(fmt.Sprintf("req err: %v", err))
-		return pr, err
+		return pr, fmt.Errorf("req allowed err: %w", err)
 	}
 
 	req.Header.Set("X-Authorization", os.Getenv("AUTH_PERMISSIONS"))
@@ -56,20 +56,20 @@ func Allowed(p permissions.Permissions) (permissions.Permissions, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("verify client err: %v", err))
-		return pr, err
+		return pr, fmt.Errorf("verify client err: %w", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Println(fmt.Sprintf("verify resp err: %v", err))
-			return pr, err
+			return pr, fmt.Errorf("verify resp err: %w", err)
 		}
 
 		err = json.Unmarshal(body, &pr)
 		if err != nil {
 			fmt.Println(fmt.Sprintf("can't unmarshall permissions: %v, %v", err, string(body)))
-			return pr, err
+			return pr, fmt.Errorf("can't unmarshall permissions: %w", err)
 		}
 	}
 

@@ -126,7 +126,7 @@ func TestHandler(t *testing.T) {
 			},
 			expect: events.APIGatewayProxyResponse{
 				StatusCode: 400,
-				Body:       `login already exists`,
+				Body:       `can't register: can't get create login: login already exists`,
 			},
 		},
 
@@ -148,7 +148,7 @@ func TestHandler(t *testing.T) {
 			},
 			expect: events.APIGatewayProxyResponse{
 				StatusCode: 400,
-				Body:       `invalid password`,
+				Body:       `can't get login: can't get login for user: login response err: invalid password`,
 			},
 		},
 		{
@@ -158,7 +158,7 @@ func TestHandler(t *testing.T) {
 			},
 			expect: events.APIGatewayProxyResponse{
 				StatusCode: 400,
-				Body:       `no identity`,
+				Body:       `can't get login: can't get login for user: login response err: no identity`,
 			},
 		},
 
