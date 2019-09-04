@@ -78,7 +78,7 @@ func LoginUser(l login.LoginRequest) (login.Login, error) {
 		return lr, err
 	}
 
-	req.Header.Set("X-Authorization", os.Getenv("AUTH_KEY"))
+	req.Header.Set("X-Authorization", os.Getenv("AUTH_LOGIN"))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -125,7 +125,7 @@ func LoginPermissions(l login.Login) ([]permissions.Permission, error) {
 		return p.Permissions, err
 	}
 
-	req.Header.Set("X-Authorization", os.Getenv("AUTH_KEY"))
+	req.Header.Set("X-Authorization", os.Getenv("AUTH_PERMISSIONS"))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)

@@ -55,7 +55,8 @@ cloudFormation()
                 ParameterKey=DNSZoneName,ParameterValue="$DNS_ZONE_NAME". \
                 ParameterKey=LoginService,ParameterValue="$SERVICE_LOGIN" \
                 ParameterKey=PermissionService,ParameterValue="$SERVICE_PERMISSIONS" \
-                ParameterKey=AuthKey,ParameterValue="$AUTH_KEY"
+                ParameterKey=AuthPermissions,ParameterValue="$AUTH_PERMISSIONS" \
+                ParameterKey=AuthLogin,ParameterValue="$AUTH_LOGIN"
     else
         AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws cloudformation update-stack \
             --template-url https://"$S3_FOLDER".s3."$AWS_REGION".amazonaws.com/"$SERVICE_NAME"/cf.yaml \
@@ -73,7 +74,8 @@ cloudFormation()
                 ParameterKey=DNSZoneName,ParameterValue="$DNS_ZONE_NAME". \
                 ParameterKey=LoginService,ParameterValue="$SERVICE_LOGIN" \
                 ParameterKey=PermissionService,ParameterValue="$SERVICE_PERMISSIONS" \
-                ParameterKey=AuthKey,ParameterValue="$AUTH_KEY"
+                ParameterKey=AuthPermissions,ParameterValue="$AUTH_PERMISSIONS" \
+                ParameterKey=AuthLogin,ParameterValue="$AUTH_LOGIN"
     fi
 }
 
@@ -93,7 +95,8 @@ if [[ -z "$TRAVIS_PULL_REQUEST" ]] || [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; t
     AUTHORIZER_ARN=$DEV_AUTHORIZER_ARN
     SERVICE_LOGIN=$DEV_SERVICE_LOGIN
     SERVICE_PERMISSIONS=$DEV_SERVICE_PERMISSIONS
-    AUTH_KEY=$DEV_AUTH_KEY
+    AUTH_PERMISSOINS=$DEV_AUTH_PERMISSIONS
+    AUTH_LOGIN=$DEV_AUTH_LOGIN
 
     echo "Deploy Dev"
     deployIt
@@ -113,7 +116,8 @@ if [[ -z "$TRAVIS_PULL_REQUEST" ]] || [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; t
             AUTHORIZER_ARN=$LIVE_AUTHORIZER_ARN
             SERVICE_LOGIN=$LIVE_SERVICE_LOGIN
             SERVICE_PERMISSIONS=$LIVE_SERVICE_PERMISSIONS
-            AUTH_KEY=$LIVE_AUTH_KEY
+            AUTH_PERMISSOINS=$LIVE_AUTH_PERMISSIONS
+            AUTH_LOGIN=$LIVE_AUTH_LOGIN
 
             echo "Deploy Live"
             deployIt

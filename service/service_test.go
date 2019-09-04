@@ -54,7 +54,7 @@ func (r Remove) deleteLogin() error {
 		return err
 	}
 
-	req.Header.Set("X-Authorization", os.Getenv("AUTH_KEY"))
+	req.Header.Set("X-Authorization", os.Getenv("AUTH_LOGIN"))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -77,7 +77,7 @@ func (r Remove) deletePermission() error {
 		fmt.Println(fmt.Sprintf("permissions remove req err: %v", err))
 	}
 
-	req.Header.Set("X-Authorization", os.Getenv("AUTH_KEY"))
+	req.Header.Set("X-Authorization", os.Getenv("AUTH_PERMISSIONS"))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)

@@ -25,7 +25,9 @@ Parameters:
     Type: String
   LoginService:
     Type: String
-  AuthKey:
+  AuthPermissions:
+    Type: String
+  AuthLogin:
     Type: String
 
 Resources:
@@ -324,7 +326,8 @@ Resources:
 #          DB_REGION: !Ref AWS::Region
           SERVICE_LOGIN: !Ref LoginService
           SERVICE_PERMISSIONS: !Ref PermissionService
-          AUTH_KEY: !Ref AuthKey
+          AUTH_PERMISSIONS: !Ref AuthPermissions
+          AUTH_LOGIN: !Ref AuthLogin
       Code:
         S3Bucket: !Ref BuildBucket
         S3Key: !Ref BuildKey

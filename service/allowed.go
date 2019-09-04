@@ -50,7 +50,7 @@ func Allowed(p permissions.Permissions) (permissions.Permissions, error) {
 		return pr, err
 	}
 
-	req.Header.Set("X-Authorization", os.Getenv("AUTH_KEY"))
+	req.Header.Set("X-Authorization", os.Getenv("AUTH_PERMISSIONS"))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
