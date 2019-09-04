@@ -102,9 +102,11 @@ func LoginUser(l login.LoginRequest) (login.Login, error) {
 		if lr.Error != "" {
 			return lr, fmt.Errorf("login response err: %v", lr.Error)
 		}
+
+		return lr, nil
 	}
 
-	return lr, nil
+	return lr, fmt.Errorf("login came back with a different statuscode: %v", resp.StatusCode)
 }
 
 // LoginPermissions ...
@@ -149,7 +151,9 @@ func LoginPermissions(l login.Login) ([]permissions.Permission, error) {
 		if p.Status != "" {
 			return p.Permissions, fmt.Errorf("permissions status err: %v", p.Status)
 		}
+
+		return p.Permissions, nil
 	}
 
-	return p.Permissions, nil
+	return p.Permissions, fmt.Errorf("permissions came back with different statuscode: %v", resp.StatusCode)
 }

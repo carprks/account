@@ -71,7 +71,9 @@ func Allowed(p permissions.Permissions) (permissions.Permissions, error) {
 			fmt.Println(fmt.Sprintf("can't unmarshall permissions: %v, %v", err, string(body)))
 			return pr, fmt.Errorf("can't unmarshall permissions: %w", err)
 		}
+
+		return pr, nil
 	}
 
-	return pr, nil
+	return pr, fmt.Errorf("allowed came back with a different statuscode: %v", resp.StatusCode)
 }
