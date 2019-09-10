@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 )
 
 // AllowedHandler ...
@@ -52,7 +53,14 @@ func Allowed(p permissions.Permissions) (permissions.Permissions, error) {
 
 	req.Header.Set("X-Authorization", os.Getenv("AUTH_PERMISSIONS"))
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 10,
+		Transport: &http.Transport{
+			MaxIdleConns: 100,
+			MaxIdleConnsPerHost: 100,
+			IdleConnTimeout: 2 * time.Minute,
+		},
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("verify client err: %v", err))

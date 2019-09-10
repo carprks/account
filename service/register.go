@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 // RegisterObject ...
@@ -82,7 +83,14 @@ func CreateLogin(r login.RegisterRequest) (login.Register, error) {
 
 	req.Header.Set("X-Authorization", os.Getenv("AUTH_LOGIN"))
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 10,
+		Transport: &http.Transport{
+			MaxIdleConns: 100,
+			MaxIdleConnsPerHost: 100,
+			IdleConnTimeout: 2 * time.Minute,
+		},
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("client err: %v", err))
@@ -138,7 +146,14 @@ func CreatePermissions(r login.Register) ([]permissions.Permission, error) {
 
 	req.Header.Set("X-Authorization", os.Getenv("AUTH_PERMISSIONS"))
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 30,
+		Transport: &http.Transport{
+			MaxIdleConns: 100,
+			MaxIdleConnsPerHost: 100,
+			IdleConnTimeout: 2 * time.Minute,
+		},
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("client err: %v", err))

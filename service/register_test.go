@@ -1,7 +1,6 @@
 package service_test
 
 import (
-	"fmt"
 	"github.com/carprks/account/service"
 	login "github.com/carprks/login/service"
 	permissions "github.com/carprks/permissions/service"
@@ -17,18 +16,20 @@ func TestRegister(t *testing.T) {
 			if env == "localDev" {
 				err := godotenv.Load()
 				if err != nil {
-					fmt.Println(fmt.Sprintf("godotenv err: %v", err))
+					t.Errorf("godotenv err: %w", err)
 				}
 			}
 		}
 	}
 
 	tests := []struct {
+		name string
 		request login.RegisterRequest
 		expect  service.RegisterObject
 		err     error
 	}{
 		{
+			name: "register: tester@carpark.ninja",
 			request: login.RegisterRequest{
 				Email:    "tester@carpark.ninja",
 				Password: "tester",
@@ -84,27 +85,29 @@ func TestRegister(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		response, err := service.Register(test.request)
-		passed := assert.IsType(t, test.err, err)
-		if !passed {
-			fmt.Println(fmt.Sprintf("register create register test err: %v, request: %v", err, test.request))
-		}
-		passed = assert.Equal(t, test.expect, response)
-		if !passed {
-			fmt.Println(fmt.Sprintf("register create register test not equal: %v", test.request))
-		}
+		t.Run(test.name, func(t *testing.T) {
+			response, err := service.Register(test.request)
+			passed := assert.IsType(t, test.err, err)
+			if !passed {
+				t.Errorf("register create register test err: %w, request: %v", err, test.request)
+			}
+			passed = assert.Equal(t, test.expect, response)
+			if !passed {
+				t.Errorf("register create register test not equal: %v", test.request)
+			}
 
-		r := Remove{
-			Identifier: test.expect.Identifier,
-		}
-		err = r.deleteLogin()
-		if err != nil {
-			fmt.Println(fmt.Sprintf("delete login: %v", err))
-		}
-		err = r.deletePermission()
-		if err != nil {
-			fmt.Println(fmt.Sprintf("delete permission: %v", err))
-		}
+			r := Remove{
+				Identifier: test.expect.Identifier,
+			}
+			err = r.deleteLogin()
+			if err != nil {
+				t.Errorf("delete login: %w", err)
+			}
+			err = r.deletePermission()
+			if err != nil {
+				t.Errorf("delete permission: %w", err)
+			}
+		})
 	}
 }
 
@@ -114,18 +117,20 @@ func TestCreatePermissions(t *testing.T) {
 			if env == "localDev" {
 				err := godotenv.Load()
 				if err != nil {
-					fmt.Println(fmt.Sprintf("godotenv err: %v", err))
+					t.Errorf("godotenv err: %w", err)
 				}
 			}
 		}
 	}
 
 	tests := []struct {
+		name string
 		request login.Register
 		expect  []permissions.Permission
 		err     error
 	}{
 		{
+			name: "create permissions: tester@carpark.ninja",
 			request: login.Register{
 				Identifier: "tester",
 				Email:      "tester@carpark.ninja",
@@ -176,23 +181,25 @@ func TestCreatePermissions(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		response, err := service.CreatePermissions(test.request)
-		passed := assert.IsType(t, test.err, err)
-		if !passed {
-			fmt.Println(fmt.Sprintf("register create permissions test err: %v, request: %v", err, test.request))
-		}
-		passed = assert.Equal(t, test.expect, response)
-		if !passed {
-			fmt.Println(fmt.Sprintf("register create permissions test not equal: %v", test.request))
-		}
+		t.Run(test.name, func(t *testing.T) {
+			response, err := service.CreatePermissions(test.request)
+			passed := assert.IsType(t, test.err, err)
+			if !passed {
+				t.Errorf("register create permissions test err: %w, request: %v", err, test.request)
+			}
+			passed = assert.Equal(t, test.expect, response)
+			if !passed {
+				t.Errorf("register create permissions test not equal: %v", test.request)
+			}
 
-		r := Remove{
-			Identifier: test.request.Identifier,
-		}
-		err = r.deletePermission()
-		if err != nil {
-			fmt.Println(fmt.Sprintf("delete permission: %v", err))
-		}
+			r := Remove{
+				Identifier: test.request.Identifier,
+			}
+			err = r.deletePermission()
+			if err != nil {
+				t.Errorf("delete permission: %w", err)
+			}
+		})
 	}
 }
 
@@ -202,18 +209,20 @@ func TestCreateLogin(t *testing.T) {
 			if env == "localDev" {
 				err := godotenv.Load()
 				if err != nil {
-					fmt.Println(fmt.Sprintf("godotenv err: %v", err))
+					t.Errorf("godotenv err: %w", err)
 				}
 			}
 		}
 	}
 
 	tests := []struct {
+		name string
 		request login.RegisterRequest
 		expect  login.Register
 		err     error
 	}{
 		{
+			name: "create login tester@carpark.ninia",
 			request: login.RegisterRequest{
 				Email:    "tester@carpark.ninja",
 				Password: "tester",
@@ -228,23 +237,25 @@ func TestCreateLogin(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		response, err := service.CreateLogin(test.request)
-		passed := assert.IsType(t, test.err, err)
-		if !passed {
-			fmt.Println(fmt.Sprintf("register create login test err: %v, request: %v", err, test.request))
-		}
+		t.Run(test.name, func(t *testing.T) {
+			response, err := service.CreateLogin(test.request)
+			passed := assert.IsType(t, test.err, err)
+			if !passed {
+				t.Errorf("register create login test err: %w, request: %v", err, test.request)
+			}
 
-		passed = assert.Equal(t, test.expect, response)
-		if !passed {
-			fmt.Println(fmt.Sprintf("register create login test not equal: %v", test.request))
-		}
+			passed = assert.Equal(t, test.expect, response)
+			if !passed {
+				t.Errorf("register create login test not equal: %v", test.request)
+			}
 
-		r := Remove{
-			Identifier: test.expect.Identifier,
-		}
-		err = r.deleteLogin()
-		if err != nil {
-			fmt.Println(fmt.Sprintf("delete login: %v", err))
-		}
+			r := Remove{
+				Identifier: test.expect.Identifier,
+			}
+			err = r.deleteLogin()
+			if err != nil {
+				t.Errorf("delete login: %w", err)
+			}
+		})
 	}
 }

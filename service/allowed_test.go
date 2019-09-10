@@ -1,7 +1,6 @@
 package service_test
 
 import (
-	"fmt"
 	"github.com/carprks/account/service"
 	login "github.com/carprks/login/service"
 	permissions "github.com/carprks/permissions/service"
@@ -17,7 +16,7 @@ func TestAllowed(t *testing.T) {
 			if env == "localDev" {
 				err := godotenv.Load()
 				if err != nil {
-					fmt.Println(fmt.Sprintf("godotenv err: %v", err))
+					t.Errorf("godotenv err: %w", err)
 				}
 			}
 		}
@@ -30,15 +29,17 @@ func TestAllowed(t *testing.T) {
 	}
 	resp, err := service.Register(r)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("login register failed: %v", err))
+		t.Errorf("login register failed: %w", err)
 	}
 
 	tests := []struct {
+		name string
 		request permissions.Permissions
 		expect  permissions.Permissions
 		err     error
 	}{
 		{
+			name: "allowed: account-login",
 			request: permissions.Permissions{
 				Identifier: "5f46cf19-5399-55e3-aa62-0e7c19382250",
 				Permissions: []permissions.Permission{
@@ -54,6 +55,7 @@ func TestAllowed(t *testing.T) {
 			},
 		},
 		{
+			name: "allowed: carparks-create",
 			request: permissions.Permissions{
 				Identifier: "5f46cf19-5399-55e3-aa62-0e7c19382250",
 				Permissions: []permissions.Permission{
@@ -71,15 +73,17 @@ func TestAllowed(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		response, err := service.Allowed(test.request)
-		passed := assert.IsType(t, test.err, err)
-		if !passed {
-			fmt.Println(fmt.Sprintf("verify test type err: %v, request: %v", err, test.request))
-		}
-		passed = assert.Equal(t, test.expect, response)
-		if !passed {
-			fmt.Println(fmt.Sprintf("verify test value response: %v, request: %v", response, test.request))
-		}
+		t.Run(test.name, func(t *testing.T) {
+			response, err := service.Allowed(test.request)
+			passed := assert.IsType(t, test.err, err)
+			if !passed {
+				t.Errorf("verify test type err: %w, request: %v", err, test.request)
+			}
+			passed = assert.Equal(t, test.expect, response)
+			if !passed {
+				t.Errorf("verify test value response: %v, request: %v", response, test.request)
+			}
+		})
 	}
 
 	deleteAccount(resp.Identifier)

@@ -1,7 +1,6 @@
 package service_test
 
 import (
-	"fmt"
 	"github.com/carprks/account/service"
 	login "github.com/carprks/login/service"
 	permissions "github.com/carprks/permissions/service"
@@ -17,7 +16,7 @@ func TestLogin(t *testing.T) {
 			if env == "localDev" {
 				err := godotenv.Load()
 				if err != nil {
-					fmt.Println(fmt.Sprintf("godotenv err: %v", err))
+					t.Errorf("godotenv err: %w", err)
 				}
 			}
 		}
@@ -30,15 +29,17 @@ func TestLogin(t *testing.T) {
 	}
 	resp, err := service.Register(r)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("login register failed: %v", err))
+		t.Errorf("login register failed: %w", err)
 	}
 
 	tests := []struct {
+		name string
 		request login.LoginRequest
 		expect  service.LoginObject
 		err     error
 	}{
 		{
+			name: "login: tester@carpark.ninja",
 			request: login.LoginRequest{
 				Email:    "tester@carpark.ninja",
 				Password: "tester",
@@ -92,15 +93,17 @@ func TestLogin(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		response, err := service.Login(test.request)
-		passed := assert.IsType(t, test.err, err)
-		if !passed {
-			fmt.Println(fmt.Sprintf("login test err: %v, request: %v", err, test.request))
-		}
-		passed = assert.Equal(t, test.expect, response)
-		if !passed {
-			fmt.Println(fmt.Sprintf("login test not equal: %v", test.request))
-		}
+		t.Run(test.name, func(t *testing.T) {
+			response, err := service.Login(test.request)
+			passed := assert.IsType(t, test.err, err)
+			if !passed {
+				t.Errorf("login test err: %w, request: %v", err, test.request)
+			}
+			passed = assert.Equal(t, test.expect, response)
+			if !passed {
+				t.Errorf("login test not equal: %v", test.request)
+			}
+		})
 	}
 
 	deleteAccount(resp.Identifier)
@@ -112,7 +115,7 @@ func TestLoginUser(t *testing.T) {
 			if env == "localDev" {
 				err := godotenv.Load()
 				if err != nil {
-					fmt.Println(fmt.Sprintf("godotenv err: %v", err))
+					t.Errorf("godotenv err: %w", err)
 				}
 			}
 		}
@@ -125,7 +128,7 @@ func TestLoginPermissions(t *testing.T) {
 			if env == "localDev" {
 				err := godotenv.Load()
 				if err != nil {
-					fmt.Println(fmt.Sprintf("godotenv err: %v", err))
+					t.Errorf("godotenv err: %w", err)
 				}
 			}
 		}

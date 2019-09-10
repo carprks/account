@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"time"
 )
 
 type resp struct {
@@ -29,14 +30,12 @@ func deleteAccount(ident string) error {
 
 	err := r.deleteLogin()
 	if err != nil {
-		fmt.Println(fmt.Sprintf("Remove Login: %v", err))
-		return err
+		return fmt.Errorf("delete account login: %w", err)
 	}
 
 	err = r.deletePermission()
 	if err != nil {
-		fmt.Println(fmt.Sprintf("Remove Permissions: %v", err))
-		return err
+		return fmt.Errorf("delete account permssions: %w", err)
 	}
 
 	return nil
@@ -45,49 +44,61 @@ func deleteAccount(ident string) error {
 func (r Remove) deleteLogin() error {
 	j, err := json.Marshal(&r)
 	if err != nil {
-		return err
+		return fmt.Errorf("delete login marshall: %w", err)
 	}
 
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/delete", os.Getenv("SERVICE_LOGIN")), bytes.NewBuffer(j))
 	if err != nil {
-		fmt.Println(fmt.Sprintf("login remove req err: %v", err))
-		return err
+		return fmt.Errorf("login remove req err: %w", err)
 	}
 
 	req.Header.Set("X-Authorization", os.Getenv("AUTH_LOGIN"))
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 10,
+		Transport: &http.Transport{
+			MaxIdleConns: 100,
+			MaxIdleConnsPerHost: 100,
+			IdleConnTimeout: 2 * time.Minute,
+		},
+	}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("login remove client err: %v", err))
+		return fmt.Errorf("login remove client err: %w", err)
 	}
 	defer resp.Body.Close()
 
-	return err
+	return nil
 }
 
 func (r Remove) deletePermission() error {
 	j, err := json.Marshal(&r)
 	if err != nil {
-		return err
+		return fmt.Errorf("delete permissions marshall: %w", err)
 	}
 
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/delete", os.Getenv("SERVICE_PERMISSIONS")), bytes.NewBuffer(j))
 	if err != nil {
-		fmt.Println(fmt.Sprintf("permissions remove req err: %v", err))
+		return fmt.Errorf("permissions remove req err: %w", err)
 	}
 
 	req.Header.Set("X-Authorization", os.Getenv("AUTH_PERMISSIONS"))
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 10,
+		Transport: &http.Transport{
+			MaxIdleConns: 100,
+			MaxIdleConnsPerHost: 100,
+			IdleConnTimeout: 2 * time.Minute,
+		},
+	}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("permissions remove client err: %v", err))
-		return err
+		return fmt.Errorf("permissions remove client err: %w", err)
 	}
 	defer resp.Body.Close()
 
-	return err
+	return nil
 }
 
 func TestHandler(t *testing.T) {
@@ -96,19 +107,21 @@ func TestHandler(t *testing.T) {
 			if env == "localDev" {
 				err := godotenv.Load()
 				if err != nil {
-					fmt.Println(fmt.Sprintf("godotenv err: %v", err))
+					t.Errorf("godotenv err: %w", err)
 				}
 			}
 		}
 	}
 
 	tests := []struct {
+		name string
 		request events.APIGatewayProxyRequest
 		expect  events.APIGatewayProxyResponse
 		err     error
 	}{
 		// Register
 		{
+			name: "register success",
 			request: events.APIGatewayProxyRequest{
 				Resource: "/register",
 				Body:     `{"email":"tester@carpark.ninja","password":"tester","verify":"tester"}`,
@@ -120,6 +133,7 @@ func TestHandler(t *testing.T) {
 			err: nil,
 		},
 		{
+			name: "register failed",
 			request: events.APIGatewayProxyRequest{
 				Resource: "/register",
 				Body:     `{"email":"tester@carpark.ninja","password":"tester","verify":"tester"}`,
@@ -132,6 +146,7 @@ func TestHandler(t *testing.T) {
 
 		// Login
 		{
+			name: "login success",
 			request: events.APIGatewayProxyRequest{
 				Resource: "/login",
 				Body:     `{"email":"tester@carpark.ninja","password":"tester"}`,
@@ -142,6 +157,7 @@ func TestHandler(t *testing.T) {
 			},
 		},
 		{
+			name: "login failed password",
 			request: events.APIGatewayProxyRequest{
 				Resource: "/login",
 				Body:     `{"email":"tester@carpark.ninja","password":"failure"}`,
@@ -152,6 +168,7 @@ func TestHandler(t *testing.T) {
 			},
 		},
 		{
+			name: "login failed identity",
 			request: events.APIGatewayProxyRequest{
 				Resource: "/login",
 				Body:     `{"email":"failure@carpark.ninja","password":"tester"}`,
@@ -164,6 +181,7 @@ func TestHandler(t *testing.T) {
 
 		// Allowed
 		{
+			name: "allowed success",
 			request: events.APIGatewayProxyRequest{
 				Resource: "/allowed",
 				Body:     `{"identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250","permissions":[{"action":"login","name":"account"}]}`,
@@ -174,6 +192,7 @@ func TestHandler(t *testing.T) {
 			},
 		},
 		{
+			name: "allowed failed",
 			request: events.APIGatewayProxyRequest{
 				Resource: "/allowed",
 				Body:     `{"identifier":"5f46cf19-5399-55e3-aa62-0e7c19382250","permissions":[{"name":"carparks","action":"create"}]}`,
@@ -186,15 +205,17 @@ func TestHandler(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		response, err := service.Handler(test.request)
-		passed := assert.IsType(t, test.err, err)
-		if !passed {
-			fmt.Println(fmt.Sprintf("service test type err: %v, request: %v", err, test.request))
-		}
-		passed = assert.Equal(t, test.expect, response)
-		if !passed {
-			fmt.Println(fmt.Sprintf("service test value response: %v, request: %v", response, test.request))
-		}
+		t.Run(test.name, func(t *testing.T) {
+			response, err := service.Handler(test.request)
+			passed := assert.IsType(t, test.err, err)
+			if !passed {
+				t.Errorf("service test type err: %w, request: %v", err, test.request)
+			}
+			passed = assert.Equal(t, test.expect, response)
+			if !passed {
+				t.Errorf("service test value response: %v, request: %v", response, test.request)
+			}
+		})
 	}
 
 	deleteAccount("5f46cf19-5399-55e3-aa62-0e7c19382250")
