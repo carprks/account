@@ -1,7 +1,7 @@
 sudo: required
 language: go
 go:
-  - 1.12.7
+  - 1.13
 notifications:
   slack:
     rooms:
@@ -15,8 +15,6 @@ notifications:
     on_pull_requests: true
 services:
   - docker
-env:
-  - GO111MODULE=on
 install:
   - pip install --user awscli
 script:
