@@ -86,9 +86,9 @@ func CreateLogin(r login.RegisterRequest) (login.Register, error) {
 	client := &http.Client{
 		Timeout: time.Second * 10,
 		Transport: &http.Transport{
-			MaxIdleConns: 100,
+			MaxIdleConns:        100,
 			MaxIdleConnsPerHost: 100,
-			IdleConnTimeout: 2 * time.Minute,
+			IdleConnTimeout:     2 * time.Minute,
 		},
 	}
 	resp, err := client.Do(req)
@@ -149,9 +149,9 @@ func CreatePermissions(r login.Register) ([]permissions.Permission, error) {
 	client := &http.Client{
 		Timeout: time.Second * 30,
 		Transport: &http.Transport{
-			MaxIdleConns: 100,
+			MaxIdleConns:        100,
 			MaxIdleConnsPerHost: 100,
-			IdleConnTimeout: 2 * time.Minute,
+			IdleConnTimeout:     2 * time.Minute,
 		},
 	}
 	resp, err := client.Do(req)

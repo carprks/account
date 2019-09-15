@@ -56,9 +56,9 @@ func Allowed(p permissions.Permissions) (permissions.Permissions, error) {
 	client := &http.Client{
 		Timeout: time.Second * 10,
 		Transport: &http.Transport{
-			MaxIdleConns: 100,
+			MaxIdleConns:        100,
 			MaxIdleConnsPerHost: 100,
-			IdleConnTimeout: 2 * time.Minute,
+			IdleConnTimeout:     2 * time.Minute,
 		},
 	}
 	resp, err := client.Do(req)
